@@ -152,7 +152,6 @@ RSpec.configure do |config|
 
   # Preparatifyication
   config.before(:suite) do
-
     Rails.logger.info <<~ASCIIART
       -~~==]}>        ######## ###########  ####      ########    ###########
       -~~==]}>      #+#    #+#    #+#     #+# #+#    #+#     #+#     #+#
@@ -163,23 +162,13 @@ RSpec.configure do |config|
       -~~==]}>  ::::::::     :::    :::    :::  :::      :::    :::
     ASCIIART
 
-    Rails.logger.info "-~=> Destroying all Base Items ... "
-    BaseItem.delete_all
+    DatabaseCleaner.strategy = :truncation
+    DatabaseCleaner.clean
 
-    # Base Items are independent of all other data, though other models depend on
-    # their existence, so we'll persist them
-    DatabaseCleaner.clean_with(:truncation, except: %w(ar_internal_metadata base_items))
-    # DatabaseCleaner.strategy = :transaction
-    #
-    __start_db_cleaning_with_log
-    __sweep_up_db_with_log
     seed_base_items_for_tests
   end
 
   config.before(:each) do
-    __start_db_cleaning_with_log
-    __sweep_up_db_with_log
-
     Rails.logger.info "\n\n-~=> Creating DEFAULT organization & partner"
     @organization = create(:organization, name: "DEFAULT")
     @partner = create(:partner, organization: @organization)
@@ -191,33 +180,19 @@ RSpec.configure do |config|
   end
 
   config.before(:each, js: true) do
-
     DatabaseCleaner.strategy = :truncation, {
       except: %w(ar_internal_metadata base_items)
     }
+    DatabaseCleaner.start
   end
 
   config.before(:each, js: false) do
-    # __start_db_cleaning_with_log
-
     DatabaseCleaner.strategy = :transaction
-
-    # # prepare a default @organization and @user to always be available for testing
-    # Rails.logger.info "\n\n-~=> Creating DEFAULT organization & partner"
-    # @organization = create(:organization, name: "DEFAULT")
-    # @partner = create(:partner, organization: @organization)
-    # Rails.logger.info "\n\n-~=> Creating DEFAULT admins & user"
-    # @organization_admin = create(:organization_admin, name: "DEFAULT ORG ADMIN", organization: @organization)
-    # @user = create(:user, organization: @organization, name: "DEFAULT USER")
-    # @super_admin = create(:super_admin, name: "DEFAULT SUPERADMIN")
-    # @super_admin_no_org = create(:super_admin_no_org, name: "DEFAULT SUPERADMIN NO ORG")
-
-    # # Print the name of the example being run
-    # Rails.logger.info "\n\n-~=> #{self.class.description} ::::::::::::::::::::::"
+    DatabaseCleaner.start
   end
 
   config.after(:each) do
-    __sweep_up_db_with_log
+    DatabaseCleaner.clean
     FileUtils.rm_rf(Dir["#{Rails.root}/tmp/storage"])
   end
 
