@@ -169,26 +169,18 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
-    Rails.logger.info "\n\n-~=> Creating DEFAULT organization & partner"
-    @organization = create(:organization, name: "DEFAULT")
-    @partner = create(:partner, organization: @organization)
-    Rails.logger.info "\n\n-~=> Creating DEFAULT admins & user"
-    @organization_admin = create(:organization_admin, name: "DEFAULT ORG ADMIN", organization: @organization)
-    @user = create(:user, organization: @organization, name: "DEFAULT USER")
-    @super_admin = create(:super_admin, name: "DEFAULT SUPERADMIN")
-    @super_admin_no_org = create(:super_admin_no_org, name: "DEFAULT SUPERADMIN NO ORG")
+    DatabaseCleaner.strategy = :transaction
   end
 
   config.before(:each, js: true) do
     DatabaseCleaner.strategy = :truncation, {
       except: %w(ar_internal_metadata base_items)
     }
-    DatabaseCleaner.start
   end
 
-  config.before(:each, js: false) do
-    DatabaseCleaner.strategy = :transaction
+  config.before(:each) do
     DatabaseCleaner.start
+    seed_with_default_records
   end
 
   config.after(:each) do
@@ -275,4 +267,15 @@ def __sweep_up_db_with_log
           .`
       .-`
   ASCIIART
+end
+
+def seed_with_default_records
+  Rails.logger.info "\n\n-~=> Creating DEFAULT organization & partner"
+  @organization = create(:organization, name: "DEFAULT")
+  @partner = create(:partner, organization: @organization)
+  Rails.logger.info "\n\n-~=> Creating DEFAULT admins & user"
+  @organization_admin = create(:organization_admin, name: "DEFAULT ORG ADMIN", organization: @organization)
+  @user = create(:user, organization: @organization, name: "DEFAULT USER")
+  @super_admin = create(:super_admin, name: "DEFAULT SUPERADMIN")
+  @super_admin_no_org = create(:super_admin_no_org, name: "DEFAULT SUPERADMIN NO ORG")
 end
