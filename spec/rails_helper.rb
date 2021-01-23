@@ -139,6 +139,11 @@ RSpec.configure do |config|
   # Make FactoryBot easier.
   config.include FactoryBot::Syntax::Methods
 
+  # Stub out Geocoder or else...
+  config.before(:all) do
+    stub_addresses
+  end
+
   # set driver for system tests
   config.before(:each, type: :system) do
     clear_downloads
@@ -172,25 +177,40 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :transaction
   end
 
-  config.before(:each, js: true) do
+  config.before(:each, type: :system) do
+    # Use truncation in the case of doing `browser` tests because it
+    # appears that transactions won't work since it really does
+    # depend on the database to have records.
     DatabaseCleaner.strategy = :truncation, {
       except: %w(ar_internal_metadata base_items)
     }
   end
 
   config.before(:each) do
+    # The database cleaner will now begin at this point
+    # up anything after this point when `.clean` is called.
     DatabaseCleaner.start
+
+    # "Dirty" the database by adding the essential records
+    # necessary to run tests.
+    #
+    # If you are using :transaction, it will just rollback any additions
+    # when `.clean` is called. Any previous changes will be kept prior to
+    # the call `DatabaseCleaner.start`
+    #
+    # If you are using :truncation, it will erase everything once `.clean`
+    # is called.
     seed_with_default_records
   end
 
   config.after(:each) do
+    # Ensure to clean-up the database by whichever means
+    # were specified before the test ran
     DatabaseCleaner.clean
-    FileUtils.rm_rf(Dir["#{Rails.root}/tmp/storage"])
-  end
 
-  # Stub out Geocoder or else...
-  config.before(:all) do
-    stub_addresses
+    # Remove any /tmp/storage files that might have been
+    # added as a consequence of the test.
+    FileUtils.rm_rf(Dir["#{Rails.root}/tmp/storage"])
   end
 
   # RSpec Rails can automatically mix in different behaviours to your tests
