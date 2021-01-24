@@ -1,12 +1,8 @@
 module Partners
-  class DashboardsController < ApplicationController
+  class DashboardsController < BaseController
     layout 'partners/application'
 
     protect_from_forgery with: :exception
-
-    # Prevent using the user for diaperbase for authentication
-    skip_before_action :authenticate_user!
-    skip_before_action :authorize_user
 
     def index; end
 

@@ -2,6 +2,7 @@
 
 class Partners::SessionsController < Devise::SessionsController
   before_action :configure_sign_in_params, only: [:create]
+
   skip_before_action :authorize_user
   skip_before_action :authenticate_user!
   # This one causes a redirect require_no_authentication

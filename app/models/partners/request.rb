@@ -16,6 +16,6 @@ module Partners
     self.table_name = "partner_requests"
 
     belongs_to :partner, dependent: :destroy
-    has_many :item_requests, class_name: 'Partners::ItemRequest', foreign_key: :partner_request_id, dependent: :destroy, inverse_of: :requests
+    has_many :item_requests, class_name: 'Partners::ItemRequest', foreign_key: :partner_request_id, dependent: :destroy, inverse_of: :request
   end
 end

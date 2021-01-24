@@ -1,12 +1,8 @@
 module Partners
-  class RequestsController < ApplicationController
+  class RequestsController < BaseController
     layout 'partners/application'
 
     protect_from_forgery with: :exception
-
-    # Prevent using the user for diaperbase for authentication
-    skip_before_action :authenticate_user!
-    skip_before_action :authorize_user
 
     def index
       @partner = current_partner_user.partner
@@ -22,6 +18,11 @@ module Partners
         [item[:name], item[:id]]
       end.sort
     end
+
+    def create
+
+    end
+
   end
 end
 
