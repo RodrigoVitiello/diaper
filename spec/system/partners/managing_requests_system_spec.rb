@@ -9,15 +9,23 @@ RSpec.describe "Managing requests", type: :system, js: true do
       end
 
       context 'WHEN they create a request properly' do
-        let(:items_to_select) do
-          Organization.find(partner_user.partner.diaper_bank_id).valid_items.sample(3)
-        end
+        let(:items_to_select) { Organization.find(partner_user.partner.diaper_bank_id).valid_items.sample(3) }
 
         before do
           fill_in 'Comments', with: Faker::Lorem.paragraph
-          select "Adult Cloth Diapers (Large/XL/XXL)", from: 'partners_request_item_requests_item_id'
-          fill_in 'partners_request_item_requests_quantity', with: 5
-          find_link('Add Another Item').click
+
+          # Select items
+          items_to_select.each_with_index do |item, idx|
+            if idx != 0
+              click_link 'Add Another Item'
+            end
+
+            last_row = find_all('tr').last
+            last_row.find('option', text: item[:name]).select_option
+            last_row.find('#partners_request_item_requests_quantity').fill_in( with:Faker::Number.within(range: 5..25))
+          end
+
+          click_button 'Submit Essentials Request'
         end
 
         it 'THEN a request will be created and the partner will be notified' do
