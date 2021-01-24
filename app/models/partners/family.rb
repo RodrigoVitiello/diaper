@@ -25,6 +25,10 @@
 #
 module Partners
   class Family < Base
+    INCOME_TYPES = %w[SSI SNAP/FOOD\ Stamps TANF WIC Housing/subsidized Housing/unsubsidized N/A].freeze
+    INSURANCE_TYPES = %w[Private\ insurance Medicaid Uninsured].freeze
+    EMPLOYMENT_TYPES = %w[Full-time Part-time N/A].freeze
+
     belongs_to :partner
 
     has_many :children, dependent: :destroy

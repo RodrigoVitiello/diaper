@@ -21,6 +21,9 @@
 #
 module Partners
   class Child < Base
+    CAN_LIVE_WITH = %w[Mother Father Grandparent Foster\ Parent Other\ Parent/Relative].freeze
+    RACES = %w[African\ American Caucasian Hispanic Asian American\ Indian Pacific\ Islander Multi-racial Other].freeze
+
     belongs_to :family
   end
 end
