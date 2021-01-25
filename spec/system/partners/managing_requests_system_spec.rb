@@ -22,15 +22,16 @@ RSpec.describe "Managing requests", type: :system, js: true do
 
             last_row = find_all('tr').last
             last_row.find('option', text: item[:name]).select_option
-            last_row.find('#partners_request_item_requests_quantity').fill_in( with:Faker::Number.within(range: 5..25))
+            last_row.find_all('.form-control').last.fill_in(with: Faker::Number.within(range: 5..25))
           end
-
-          click_button 'Submit Essentials Request'
         end
 
-        it 'THEN a request will be created and the partner will be notified' do
-          expect(Request.all.count).to eq(1)
-          expect(Request.all.count).to eq(1)
+        it 'THEN a request records will be created and the partner will be notified via flash message' do
+          # Ensure all records are created
+          expect { click_button 'Submit Essentials Request' }.to change { Partners::Request.count + Request.count }.by(2)
+
+          expect(current_path).to eq(partner_user_root_path)
+          expect(page).to have_content('Request was successfully created.')
         end
       end
     end

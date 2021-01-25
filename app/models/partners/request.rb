@@ -17,5 +17,9 @@ module Partners
 
     belongs_to :partner, dependent: :destroy
     has_many :item_requests, class_name: 'Partners::ItemRequest', foreign_key: :partner_request_id, dependent: :destroy, inverse_of: :request
+    accepts_nested_attributes_for :item_requests
+
+    validates_associated :item_requests
+    validates :item_requests, presence: true
   end
 end
