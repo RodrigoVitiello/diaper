@@ -21,7 +21,6 @@ module Partners
 
     def create
       @partner_request = Partners::Request.new(partner_request_params.merge(partner_id: current_partner_user.id))
-      @partner_request.item_requests.build
       @partner_request.item_requests << create_item_requests
 
       @requestable_items = Organization.find(current_partner_user.partner.diaper_bank_id).valid_items.map do |item|

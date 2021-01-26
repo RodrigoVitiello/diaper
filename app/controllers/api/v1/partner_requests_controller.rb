@@ -1,4 +1,5 @@
 # Creates the primary channel through which Partners submit requests, which occurs via the API
+        render :new
 class API::V1::PartnerRequestsController < ApplicationController
   skip_before_action :verify_authenticity_token
   skip_before_action :authenticate_user!
@@ -12,6 +13,7 @@ class API::V1::PartnerRequestsController < ApplicationController
 
     if request.save
       NotifyPartnerJob.perform_now(request.id)
+
       render json: request, status: :created
     else
       render json: request.errors, status: :bad_request
